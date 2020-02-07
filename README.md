@@ -25,7 +25,7 @@ To run through an example: If the word "arbitration" is used 1 time in a 20 word
 
 My hypothesis going in was that the TF-IDF would be more useful for me because I was hoping that certain unique words would be better signals for my model and that hypothesis was correct! But only by a little (increase in accuracy of 2%), luckily voncount the count vectorizer will return later.
 
-![alt text](https://github.com/emkawong/capstone2/blob/master/src/VonCount.png "Sad%20Count")
+![alt text](https://github.com/emkawong/capstone2/blob/master/src/VonCount.jpeg "Sad_Count")
 
 A couple of other parameters I included: 
  - stopwords - all indications of the company as I felt that there may be some data leakage if all of one company's policies were bad - then the model would learn that "faceco" was a strong indication of a negative classification. 
@@ -99,7 +99,9 @@ Ideally, my next stop is generation text summaries like the one provided on TOS;
 ## Resources:
 
 Resources that helped me with this project:
+
 https://web.stanford.edu/~jurafsky/slp3/slides/7_NB.pdf
+
 https://www.cs.waikato.ac.nz/ml/publications/2004/kibriya_et_al_cr.pdf
 
 
