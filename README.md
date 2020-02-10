@@ -50,6 +50,8 @@ There are three main pieces here, that I've split up even further and color code
 
 After the probability is calculated for each class, the highest probability is chosen as the classifier. 
 
+### Results
+
 Here's an example of a correctly calculated TOS (Acual:"Bad" & Predicted:"Bad")
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/AccuratePredict.png "Correct TOS")
@@ -61,7 +63,7 @@ Here's an example of an incorrectly calculated TOS (Acual:"Good" & Predicted:"Ba
 For being a "naive" model, the results are pretty good! Below is the confusion matrix that calculates the number of Predicted vs. Actual documents for the three classes. The areas where I correctly predicted are darker. The area that I was the most concerned about is the portion that I've labeled the danger zone, for those are the ones that were labeled "bad" and I identified as "good" or "neutral".
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/ConfusionMatrix.png "Confusion Matrix")
-
+ 
 This brings me to my AU-ROC curve that I calculated in the One Vs All method. Since ROC curves are plotted to show the tradeoff between the True Positive and True Negative Rate of two classes, I needed an approach that would allow me to plot my multiclass classifier. 
 
 With One Vs All, what I've done is to train the model three times with Bad Vs Good&Neutral, Good Vs Bad&Neutral, and Neutral Vs Good&Bad. This is easier than classifying the data into three distinct classes so the AUC (Area Under Curve) turns out to be pretty high. 
