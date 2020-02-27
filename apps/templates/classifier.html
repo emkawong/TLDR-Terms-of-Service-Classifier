@@ -1,0 +1,60 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>How Good Are Your Terms?</title>
+    <meta name="description" content="Terms of Service Classifier">
+    <meta name="author" content = "emkawong">
+    <script src="{{ url_for('static', filename='brython.js')}}"></script>
+    <script src="{{ url_for('static', filename='brython_stdlib.js')}}"></script>
+
+</head>
+
+<body onload="brython()">
+
+    <h1>How Good Are Your Terms?</h1>
+    <p>Terms of Services are hard to read, input a paragraph and get back a classification!</p>
+    <p>Please paste a paragraph below:</p>
+
+    <div>
+        <span>Terms of Service:</span> <input id="term"></input>
+    </div>
+
+    <div>
+        <button type="button" id="solve">Classify!</button>
+    </div>
+
+    <div>
+        <p>Predicted Classification: <span id="solution"></span></p>
+
+<script type="text/python">
+
+from browser import document, ajax
+import json
+
+def get_input_term():
+    term = document['term'].value
+    
+    return {'term': str(term)}
+
+def display_solutions(req):
+    result = json.loads(req.text)
+    document['solution'].html = f"{result['classification']}"
+
+def send_term_json(term):
+    req = ajax.Ajax()
+    req.bind('complete', display_solutions)
+    req.open('POST','/solve',True)
+    req.set_header('Content-Type', 'application/json')
+    req.send(json.dumps(term))
+    
+def click(event):
+    term = get_input_term()
+    send_term_json(term)
+
+document['solve'].bind('click', click)    
+
+</script>
+
+</body>
+</html>
