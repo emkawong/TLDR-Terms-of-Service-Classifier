@@ -1,60 +1,89 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-
     <title>How Good Are Your Terms?</title>
     <meta name="description" content="Terms of Service Classifier">
     <meta name="author" content = "emkawong">
-    <script src="{{ url_for('static', filename='brython.js')}}"></script>
-    <script src="{{ url_for('static', filename='brython_stdlib.js')}}"></script>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/main.css')}}" rel="stylesheet">
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js')}}"></script>
 </head>
 
-<body onload="brython()">
-
-    <h1>How Good Are Your Terms?</h1>
-    <p>Terms of Services are hard to read, input a paragraph and get back a classification!</p>
-    <p>Please paste a paragraph below:</p>
-
-    <div>
-        <span>Terms of Service:</span> <input id="term"></input>
-    </div>
-
-    <div>
-        <button type="button" id="solve">Classify!</button>
-    </div>
-
-    <div>
-        <p>Predicted Classification: <span id="solution"></span></p>
-
-<script type="text/python">
-
-from browser import document, ajax
-import json
-
-def get_input_term():
-    term = document['term'].value
-    
-    return {'term': str(term)}
-
-def display_solutions(req):
-    result = json.loads(req.text)
-    document['solution'].html = f"{result['classification']}"
-
-def send_term_json(term):
-    req = ajax.Ajax()
-    req.bind('complete', display_solutions)
-    req.open('POST','/solve',True)
-    req.set_header('Content-Type', 'application/json')
-    req.send(json.dumps(term))
-    
-def click(event):
-    term = get_input_term()
-    send_term_json(term)
-
-document['solve'].bind('click', click)    
-
-</script>
-
+<body class="blue-grey lighten-5">
+    <header>
+        <nav class="blue-grey">
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo right">T.o.S.</a>
+                <ul id="nav-mobile" class="left hide-on-med-and-down">
+                    <li><a href="sass.html">Good/Bad Analysis</a></li>
+                    <li><a href="badges.html">Layman Converter</a></li>
+                    <li><a href="collapsible.html">About Me</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <div class="row">
+                <!-- START OF FORM -->
+                <div class="col s8">
+                    <div class="row">
+                        <div class="col s12">
+                            <h2>How Good Are Your Terms?</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <h6>Terms of Services are hard to read, input a paragraph and get back a classification!</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <form class="col s12">
+                            <div class="row">
+                                <div class="col s12">
+                                    <h4>Terms of Service:</h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <!-- START INPUT FROM USER -->
+                                    <textarea id="term" class="materialize-textarea"></textarea>
+                                    <label for="term">Please paste a paragraph below.</label>
+                                    <!-- END INPUT FROM USER -->
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <button class="btn waves-effect waves-light" id="solve">Analyze</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- END OF FORM -->
+                <!-- START RESULTS FOR GOOD/BAD  -->
+                <div class="row">
+                    <div class="col s12">
+                        <h1 id="solution"></h1>
+                    </div>
+                </div>
+                <!-- END RESULTS FOR GOOD/BAD  -->
+                <!-- START GRAPH -->
+                <div class="row">
+                    <div class="col s12">
+                        <canvas id="result-chart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+                <!-- END GRAPH -->
+            </div>
+        </div>
+    </main>
 </body>
 </html>

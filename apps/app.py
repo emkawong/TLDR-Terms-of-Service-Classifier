@@ -6,6 +6,7 @@ from sklearn.naive_bayes import MultinomialNB
 
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 @app.route('/', methods=['GET'])
 def index():
@@ -20,7 +21,17 @@ def solve():
     input_vectorized = tfidf_model.transform(pd.Series(term)).toarray()
     classification = str(loaded_model.predict(input_vectorized))
     
-    return jsonify({'classification':classification})
+    # Edit this to return the array of points from the solution computed above
+    results = [
+        # x: Company / y: Paragraph
+        {"x": 1, "y": 1, "color": "red"},
+        {"x": 2, "y": 1, "color": "red"},
+        {"x": 3, "y": 1, "color": "red"},
+        {"x": 4, "y": 1, "color": "red"},
+        {"x": 5, "y": 1, "color": "red"},
+    ]
+
+    return jsonify({'results':results})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
