@@ -22,6 +22,8 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import roc_curve, auc
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.preprocessing import label_binarize
+#filter warnings
+import warnings
 
 class ToS_Classifier():
 
@@ -54,7 +56,7 @@ class ToS_Classifier():
         '''
         From the converted data, create dataframes containing all pertinent information.
         '''
-        all_data = self.get_data()
+        all_data = self.pull_data()
         pd_list = []
         for data in all_data:
             pd_list.append(pd.DataFrame.from_dict(data['pointsData']).T)
@@ -75,62 +77,74 @@ class ToS_Classifier():
         full_df = full_df.dropna(axis=0,subset=['quoteText'])
         full_df['label'] = full_df['point']
         full_df.label = full_df.label.replace(['blocker','bad','neutral','good'],[1,1,0,0])
-        self.X = full_df.quoteText
-        self.y = full_df.label
-        
-        return self.X,self.y
+  
+        return full_df.quoteText, full_df.label
     
-    def vectorize_text(self,X,y,method=TfidfVectorizer,cross_validate=True):
+    def vectorize_text(self,X,new_X=None,y=None,cross_validate=False):
         '''
         Parse and vectorize the text using Term Frequency - Inverse Document Frequency (other methods can be used if preferred).
-        Plus an option to not cross_validate date for final production. 
+        Plus an option to cross validate for testing with additional y label input. 
         '''
-        X,y = self.get_data()
         if cross_validate:
-            self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X,self.y,test_size=test_size)
+            X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=.25)
             #remove the company names in case of data leakage 
             companies = [company_name.split('.')[0] for company_name in self.get_company_names()]
-            tfiddy = TfidfVectorizer(stop_words=companies)
-            tfiddy.fit(X_train)
+            self.tfiddy = TfidfVectorizer(stop_words=companies)
+            self.tfiddy.fit(X_train)
+            return self.tfiddy.transform(X_train).toarray(),self.tfiddy.transform(X_test).toarray(),y_train,y_test
+        else:
+            companies = [company_name.split('.')[0] for company_name in self.get_company_names()]
+            self.tfiddy = TfidfVectorizer(stop_words=companies)
+            self.tfiddy.fit(X)
+            if new_X is None:
+                return self.tfiddy.fit_transform(X).toarray()
+            else:
+                return self.tfiddy.transform(new_X).toarray()
             
-    def ensemble_fit(self,X,y,modelnames=['mnb','logreg'],models=
-                            [MultinomialNB(alpha=.1),LogisticRegressionCV(solver='lbfgs',Cs=100,max_iter=200)]):
-        for name,model in zip(modelnames,models):
-            self.name = model
-        self.get_data()
-        self.mnb.fit(X,y)
-        self.logreg.fit(X,y)
+    def ensemble_fit(self,X_vectorized,y,
+                     model_1=MultinomialNB(alpha=.1),model_2=LogisticRegressionCV(solver='lbfgs',Cs=100,max_iter=200)):
+        '''
+        Ensemble two models
+        '''
+        self.model_1 = model_1
+        self.model_2 = model_2
+        self.model_1.fit(X_vectorized,y)
+        self.model_2.fit(X_vectorized,y)
         
-    def clean_tos(self,new_tos):
-        new_tos = new_tos.split('\n')
-        new_tos = [term for term in terms_US if term != '']
-        self.vectorize_text(cross_validate=False)
-        tos_list = []
-        for term in new_tos:
-            tos_list.append(str(loaded_model.predict(tfidf_model.transform(pd.Series(term)).toarray())))
+    def clean_tos(self,X,new_X):
+        new_X = new_X.split('\n')
+        new_X = [term for term in new_X if term != '']
+   
+        return self.vectorize_text(X,new_X)
         
-    def predict_proba(self,new_tos):
-        new_tos = new_tos.split('\n')
-        new_tos = [term for term in terms_US if term != '']
-        tos_list = []
-        for term in new_tos:
-            tos_list.append(str(loaded_model.predict(tfidf_model.transform(pd.Series(term)).toarray())))
-        self.mnb.predict_proba(new_tos)
-        self.logreg.predict_proba(new_tos)
+    def predict_proba(self,X,test_input=False,test_X=None,input_user=False,input_X=None):
+        
+        if test_input and text_X is not None:
+            self.model_1.predict_proba(test_X)
+            self.model_2.predict_proba(test_X)
+            return (self.model_1.predict_proba(test_X) + self.model_2.predict_proba(self.clean_tos(test_X)))/2
+        elif input_user and input_X is not None:
+            self.model_1.predict_proba(self.clean_tos(X,input_X))
+            self.model_2.predict_proba(self.clean_tos(X,input_X))
+            return (self.model_1.predict_proba(self.clean_tos(X,input_X)) + 
+                    self.model_2.predict_proba(self.clean_tos(X,input_X)))/2
+        else:
+            return 'Set input_test or input_user to True and add additional X values to predict.'
         
     def get_colors(self,proba,colors=['C7FEDD','DFEEB9','F2DE97','FAA181','F77B7E']):
         self.color_proba = []
         for prob in proba:
-            if proba <= 0.2:
+            if prob <= 0.2:
                 self.color_proba.append(colors[0])
-            elif proba > 0.2 and proba <= 0.4:
+            elif prob > 0.2 and prob <= 0.4:
                 self.color_proba.append(colors[1])
-            elif proba > 0.4 and proba <= 0.6:
+            elif prob > 0.4 and prob <= 0.6:
                 self.color_proba.append(colors[2])
-            elif proba > 0.6 and proba <= 0.8:
+            elif prob > 0.6 and prob <= 0.8:
                 self.color_proba.append(colors[3])
             else:
                 self.color_proba.append(colors[4])
+        return self.color_proba
         
 if __name__ == "__main__":
     tos = ToS_Classifier('../tosdr.org/api/1/service')
