@@ -1,4 +1,4 @@
-# Too Long; Did Not Read 
+# Explain The Terms Like I Am 5 - Classification and Generation
 
 ## A Wall of Words: An Introduction
 
@@ -7,9 +7,14 @@ The last time I read the full terms of service (TOS) for any of the product I us
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/Youtube.png "Less Good")
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/Google.png "Good")
 
-My mission was to take these individual TOS, take the labels that were provided, and try and build a model that could classify the TOS into good, bad, or neutral (blocker was grouped into bad as it was too small to classify). 
+My mission was to take these individual TOS, take the labels that were provided, and try and build a model that could classify the TOS into good, bad, or neutral (blocker was grouped into bad as it was too small to classify). After classifying the terms and giving an explainable probability of "badness," I generate an abstractive summary of that term. 
 
-## TFIDF (TFiddy) or Count (VonCount): Thinking about Cleaning
+This project cant be broken down into three main portions:
+    1. Data Wrangling
+    2. Classification
+    3. Text Generation
+
+## 1. TFIDF (TFiddy) or Count (VonCount): Thinking about Cleaning
 
 The data from TOS;DR is easily accessible through their API and also available in their github in individually saved json files. After spending some time pulling and organizing data, I wrangled all of the information into one pandas dataframe. The "dirty" work can all be viewed in my notebook. From that dataframe, for this project I was only interested in two columns. The "document" column that contained all of the 2,549 TOS that were pulled from the website along with the "label" column that contained information on whether that TOS was "good","neutral", or "bad" from the perspective of the contributors to the TOS;DR website.
 
@@ -31,7 +36,7 @@ A couple of other parameters I included:
  - stopwords - all indications of the company as I felt that there may be some data leakage if all of one company's policies were bad - then the model would learn that "faceco" was a strong indication of a negative classification. 
  - an N-gram range of (1,2), so that phrases like "may retain" and "not retain" could be differentiated a little better. Surprisingly, this did not have a large effect, I hypothesize that the legalize from a company that wants to retain information will be very different from a company that does not - I explore this a little more later.
 
-## The Glass Slipper: Choosing a Model
+## 2. The Glass Slipper: Choosing a Model
 
 The quick, go-to model for text classification is Naive Bayes. A model that is based on the "naive" assumption that each word is independent. In general, naive bayes is considered a good baseline but tends to not be the most accurate model. It works well with a small or a very large corpus, and as my corpus is relatively small, I hoped to get good results! I specifically used the multinomial Naive Bayes model as I was working with multiclass data.
 
@@ -50,7 +55,7 @@ There are three main pieces here, that I've split up even further and color code
 
 After the probability is calculated for each class, the highest probability is chosen as the classifier. 
 
-### Results
+#### Results
 
 Here's an example of a correctly calculated TOS (Acual:"Bad" & Predicted:"Bad")
 
@@ -74,7 +79,7 @@ I experimented with Logistic Regression, Random Forests, and Gradient Boosting, 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/RandomForestROC.png "RandomForest-ROC")
 
-## A Side Quest: Finding the Magic Words
+#### A Side Quest: Finding the Magic Words
 
 VonCount returns! One obvious question that popped in my mind is to explore why Naive Bayes works well. Since it is a simple model that is completely dependent on words, then those words must be pretty important! I used the Count Vectorizer to create one more metric - distinctness. 
 
@@ -92,7 +97,7 @@ Bad:
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/BadWords.png "Bad Words")
 
-## End of one Journey: On to the Next!
+## 3. Explain The Terms Like I Am 5
 
 I was pretty happy with my results, I think more text cleaning could help this process immensely. The TOS;DR website is not the cleanest and not every term of service is clearly labeled. 
 

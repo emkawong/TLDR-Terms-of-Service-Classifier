@@ -17,7 +17,7 @@ class Seq2Seq_With_Attention_Train(object):
         "tates" = annotations
     '''
     def __init__(self, model_name='base',
-                        data_file_path='data/tos_summary.csv',
+                        data_file_path='../data/tos_summary.csv',
                         num_epochs=100, batch_size=64, latent_dim=256,
                         optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'],
                         input_text_col='quoteText', target_text_col='title',
@@ -25,7 +25,7 @@ class Seq2Seq_With_Attention_Train(object):
 
         self.model_name = model_name
         self.data_file_path = data_file_path
-        self.weights_file_path = f'models/{self.model_name}_weights.h5'
+        self.weights_file_path = f'../models/{self.model_name}_weights.h5'
 
         self.num_epochs = num_epochs # 20, 40, 80, 100, 120
         self.batch_size = batch_size #64
@@ -134,18 +134,18 @@ class Seq2Seq_With_Attention_Train(object):
         text_stats['max_decoder_seq_length'] = self.max_decoder_seq_length
         text_stats['avg_encoder_seq_length'] = self.avg_encoder_seq_length
         text_stats['avg_decoder_seq_length'] = self.avg_decoder_seq_length
-        np.save(f'./{self.model_name}_text_stats.npy', text_stats)
+        np.save(f'../data/{self.model_name}_text_stats.npy', text_stats)
 
         # create and save dicts of chars to indices and reverse for encoding and decoding one-hot values
         self.input_token_index = dict([(char, i) for i, char in enumerate(self.input_characters)])
         self.reverse_input_char_index = dict((i, char) for char, i in self.input_token_index.items())
-        np.save(f'./{self.model_name}_input_token_index.npy', self.input_token_index)
-        np.save(f'./{self.model_name}_reverse_input_char_index.npy', self.reverse_input_char_index)
+        np.save(f'../data/{self.model_name}_input_token_index.npy', self.input_token_index)
+        np.save(f'../data/{self.model_name}_reverse_input_char_index.npy', self.reverse_input_char_index)
 
         self.target_token_index = dict([(char, i) for i, char in enumerate(self.target_characters)])
         self.reverse_target_char_index  = dict((i, char) for char, i in self.target_token_index.items())
-        np.save(f'./{self.model_name}_target_token_index.npy', self.target_token_index)
-        np.save(f'./{self.model_name}_reverse_target_char_index.npy', self.reverse_target_char_index)
+        np.save(f'../data/{self.model_name}_target_token_index.npy', self.target_token_index)
+        np.save(f'../data/{self.model_name}_reverse_target_char_index.npy', self.reverse_target_char_index)
 
         self._save_actual_pairs_used()
         self._vectorize_text()
@@ -155,7 +155,7 @@ class Seq2Seq_With_Attention_Train(object):
         INPUT: model name, input and target token index lookup dictionaries, input and target texts
         OUTPUT: writes input and target token lookup dictionaries and actual input/target texts to text file and saves
         '''
-        outF = open(f"./{self.model_name}_pairs_used.txt", "w")
+        outF = open(f"../data/{self.model_name}_pairs_used.txt", "w")
         outF.write(str(self.input_token_index))
         outF.write("\n")
         outF.write(str(self.target_token_index))
@@ -203,13 +203,11 @@ class Seq2Seq_With_Attention_Train(object):
         # Define encoder model input and LSTM layers and states
         encoder_inputs = Input(shape=(None, self.num_encoder_tokens), name='encoder_inputs')
         encoder = LSTM(self.latent_dim, return_sequences=True, return_state=True, name='encoder')
-        print(encoder(encoder_inputs))
         encoder_outputs, state_h, state_c = encoder(encoder_inputs)
         encoder_states = [state_h, state_c]
 
         # Set up the decoder, using 'encoder_states' as initial state.
         # We set up our decoder to return full output sequences and to return internal states as well.
-        # We don't use the return states in the training model, but we will use them in inference.
 
         decoder_inputs = Input(shape=(None, self.num_decoder_tokens), name='decoder_inputs')
         decoder = LSTM(self.latent_dim, return_sequences=True, return_state=True, name='decoder')
@@ -224,7 +222,7 @@ class Seq2Seq_With_Attention_Train(object):
         decoder_combined_context = Concatenate(axis=-1)([context, decoder_outputs])
 
         output = TimeDistributed(Dense(64, activation="tanh"))(decoder_combined_context)
-        decoder_outputs = TimeDistributed(Dense(self.latent_dim, activation="softmax"))(output)
+        decoder_outputs = TimeDistributed(Dense(self.num_decoder_tokens, activation="softmax"))(output)
 
         decoder_dense = Dense(self.num_decoder_tokens, activation='softmax', name='decoder_dense')
         decoder_outputs = decoder_dense(decoder_outputs)
@@ -243,14 +241,14 @@ class Seq2Seq_With_Attention_Train(object):
                         self.decoder_target_data, batch_size=self.batch_size,
                         epochs=self.num_epochs, validation_split=0.1, callbacks=[checkpoint])
 
-        with open(f'./trainHistoryDict_{self.model_name}.pkl', 'wb') as file_pi:
+        with open(f'../data/trainHistoryDict_{self.model_name}.pkl', 'wb') as file_pi:
             pickle.dump(self.history.history, file_pi)
 
-        self.model.save_weights(f'./{self.model_name}_final_weights.h5')
+        self.model.save_weights(f'../models/{self.model_name}_final_weights.h5')
 
 if __name__ == "__main__":
     s2s_model = Seq2Seq_With_Attention_Train(model_name='base',
-                                        num_epochs=1,
+                                        num_epochs=10,
                                         latent_dim=256,
                                         optimizer='adam')
     s2s_model.prep_text()

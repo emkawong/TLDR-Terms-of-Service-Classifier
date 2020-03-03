@@ -1,15 +1,8 @@
-'''CREDITS
-Based on Keras' Seq2Seq tutorial
-    https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html
-Adapted from OOP version of above tutorial written by cohort peer working on similar project:
-    GitHub: MattD82
-    Matt's project: https://github.com/MattD82/Seinfeld-Neural-seq2seq-Chatbot
-'''
 import numpy as np
 import re
 
 from keras.models import Model
-from keras.layers import Input, LSTM, Dense
+from keras.layers import Input, LSTM, Dense, TimeDistributed, dot, Activation, Concatenate
 from keras.callbacks import ModelCheckpoint
 
 class SummaryGenerator(object):
@@ -34,28 +27,37 @@ class SummaryGenerator(object):
         self.end_token = end_token # '\b'
 
         # load in model feature values
-        self.text_stats = np.load(f'{self.data_filepath}{self.data_name}_text_stats.npy').item()
+        self.text_stats = np.load(f'{self.data_filepath}{self.data_name}_text_stats.npy',allow_pickle = True).item()
         self.num_encoder_tokens = self.text_stats['num_encoder_tokens']
         self.num_decoder_tokens = self.text_stats['num_decoder_tokens']
         self.max_encoder_seq_length = self.text_stats['max_encoder_seq_length']
         self.max_decoder_seq_length = self.text_stats['max_decoder_seq_length']
 
         # load in char to idx dictionary values
-        self.input_token_index = np.load(f'{self.data_filepath}{self.data_name}_input_token_index.npy').item()
-        self.reverse_input_char_index = np.load(f'{self.data_filepath}{self.data_name}_reverse_input_char_index.npy').item()
-        self.target_token_index = np.load(f'{self.data_filepath}{self.data_name}_target_token_index.npy').item()
-        self.reverse_target_char_index = np.load(f'{self.data_filepath}{self.data_name}_reverse_target_char_index.npy').item()
+        self.input_token_index = np.load(f'{self.data_filepath}{self.data_name}_input_token_index.npy',allow_pickle = True).item()
+        self.reverse_input_char_index = np.load(f'{self.data_filepath}{self.data_name}_reverse_input_char_index.npy',allow_pickle = True).item()
+        self.target_token_index = np.load(f'{self.data_filepath}{self.data_name}_target_token_index.npy',allow_pickle = True).item()
+        self.reverse_target_char_index = np.load(f'{self.data_filepath}{self.data_name}_reverse_target_char_index.npy',allow_pickle = True).item()
 
         # Define encoder model input and LSTM layers and states exactly as defined in training model
         encoder_inputs = Input(shape=(None, self.num_encoder_tokens), name='encoder_inputs')
-        encoder = LSTM(self.latent_dim, return_state=True, name='encoder_LSTM')
+        encoder = LSTM(self.latent_dim, return_sequences=True, return_state=True, name='encoder')
         encoder_outputs, state_h, state_c = encoder(encoder_inputs)
         encoder_states = [state_h, state_c]
         decoder_inputs = Input(shape=(None, self.num_decoder_tokens), name='decoder_inputs')
-        decoder_lstm = LSTM(self.latent_dim, return_sequences=True, return_state=True, name='decoder_lstm')
-        decoder_outputs, _, _ = decoder_lstm(decoder_inputs, initial_state=encoder_states)
+        decoder = LSTM(self.latent_dim, return_sequences=True, return_state=True, name='decoder')
+        decoder_outputs, _, _ = decoder(decoder_inputs, initial_state=encoder_states)
+        
+        # Add attention layer
+        attention = dot([decoder_outputs, encoder_outputs], axes=[2, 2], normalize=False)
+        attention = Activation('softmax')(attention)
+        context = dot([attention, encoder_outputs],axes=[2, 1])
+        decoder_combined_context = Concatenate(axis=-1)([context, decoder_outputs])
+        output = TimeDistributed(Dense(64, activation="tanh"))(decoder_combined_context)
+        decoder_outputs = TimeDistributed(Dense(self.latent_dim, activation="softmax"))(output)
         decoder_dense = Dense(self.num_decoder_tokens, activation='softmax', name='decoder_dense')
         decoder_outputs = decoder_dense(decoder_outputs)
+
         self.model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
         # load trained weights
         self.model.load_weights(f'{self.models_filepath}{self.trained_model}{self.final_weights_filepath}.h5')
@@ -65,7 +67,7 @@ class SummaryGenerator(object):
         decoder_state_input_h = Input(shape=(self.latent_dim,))
         decoder_state_input_c = Input(shape=(self.latent_dim,))
         decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
-        decoder_outputs, state_h, state_c = decoder_lstm(decoder_inputs, initial_state=decoder_states_inputs)
+        decoder_outputs, state_h, state_c = decoder(decoder_inputs, initial_state=decoder_states_inputs)
         decoder_states = [state_h, state_c]
         decoder_outputs = decoder_dense(decoder_outputs)
         self.decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
@@ -154,8 +156,7 @@ class SummaryGenerator(object):
         INPUT: none
         OUTPUT: prints hardcoded input and generated annotation
         '''
-        input_sentence = "We may partner with a third party either to display advertising on our site or to manage our advertising on this site and other sites. Our third party partner may use technologies such as cookies to gather information about your activities on this site and other sites in order to provide you advertising based upon your browsing activities and interests"
-
+        input_sentence = 'You own or otherwise have the lawful right to provide the information that you provide to Alignable or allow Alignable to access under this Agreement, and may request its deletion at any time, unless you have shared information or content with other Users and they have not deleted it, or it was copied or stored by other Users with your permission.'
         print(f"\n\nInput Sentence: {input_sentence}")
         print(f"Reply: {self.reply(input_sentence)}")
 
@@ -165,7 +166,7 @@ def main():
                         data_filepath='./data/',
                         final_weights_filepath='_weights',
                         data_name='base',
-                        latent_dim=512,
+                        latent_dim=256,
                         temp=1)
 
     model.test_run()

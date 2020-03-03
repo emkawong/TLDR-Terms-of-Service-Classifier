@@ -3,11 +3,16 @@ import numpy as np
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
+from tosclassifier import ToS_DataCleaner
 from tosclassifier import ToS_Classifier
 
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+
+cleaner = ToS_DataCleaner('./tosdr.org/api/1/service')
+companies = cleaner.get_company_names()
+df = cleaner.create_df()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -17,7 +22,7 @@ def index():
 def solve():
     user_data = request.json
     term = user_data['term']
-    model = pickle.load(open('classifier.pkl','rb'))
+    model = pickle.load(open('tos_classifier.pkl','rb'))
     X,_ = model.get_data()
     probability = model.predict_proba(X,input_user=True,input_X=term)
     classification = model.get_color(probability[:,1])

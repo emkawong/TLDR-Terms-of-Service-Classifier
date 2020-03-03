@@ -42,8 +42,7 @@ $(document).ready(() => {
             datasets: [{
                 label: "Scatter Dataset",
                 data: [
-                    {labels: ['dog'],
-                    
+                    {
                         x: 1,
                         y: 1
                     },
@@ -63,14 +62,6 @@ $(document).ready(() => {
             }]
         },
         options: {
-            tooltips: {
-                mode: 'index',
-                intersect: false
-             },
-             hover: {
-                mode: 'index',
-                intersect: false
-             },
             scales: {
                 xAxes: [{
                     offset: true,
@@ -78,7 +69,6 @@ $(document).ready(() => {
                         max: 5,
                         suggestedMin: 1,
                         suggestedMax: 5,
-                    labels: ['dog']
                     }
                 }],
                 yAxes: [{
