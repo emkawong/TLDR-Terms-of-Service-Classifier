@@ -39,6 +39,7 @@ $(document).ready(() => {
     window.chart = new Chart(ctx, {
         type: "scatter",
         data: {
+            labels: ["JAN", "FEB", "MAR"],
             datasets: [{
                 label: "Scatter Dataset",
                 data: [
@@ -62,6 +63,7 @@ $(document).ready(() => {
             }]
         },
         options: {
+            backgroundColor:'rgb(40,10,20)',
             scales: {
                 xAxes: [{
                     offset: true,

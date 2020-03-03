@@ -1,9 +1,7 @@
 # the usual imports
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from collections import Counter
+import pickle
 # create a list of file names to pull each json file
 from os import listdir
 from os.path import isfile, join
@@ -18,13 +16,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB,MultinomialNB,ComplementNB
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-# metric imports
-from sklearn.metrics import roc_curve, auc
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.preprocessing import label_binarize
-#filter warnings
-import warnings
-import pickle
 
 class ToS_DataCleaner():
 
