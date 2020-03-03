@@ -72,8 +72,9 @@ class ToS_DataCleaner():
     
 class ToS_Classifier(): 
 
-    def __init__(self,df):
+    def __init__(self,df,stopwords):
         self.df = df
+        self.stopwords = stopwords
 
     def get_data(self):
         '''
@@ -85,12 +86,12 @@ class ToS_Classifier():
   
         return self.df.quoteText, self.df.label
     
-    def vectorize_text(self,X,stopwords,new_X=None,y=None,cross_validate=False):
+    def vectorize_text(self,X,new_X=None,y=None,cross_validate=False):
         '''
         Parse and vectorize the text using Term Frequency - Inverse Document Frequency (other methods can be used if preferred).
         Plus an option to cross validate for testing with additional y label input. 
         '''
-        stopwords = [word.split('.')[0] for word in stopwords]
+        stopwords = [word.split('.')[0] for word in self.stopwords]
         if cross_validate:
             X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=.25)
             #remove the company names in case of data leakage 
@@ -127,7 +128,7 @@ class ToS_Classifier():
             self.model_1.predict_proba(test_X)
             self.model_2.predict_proba(test_X)
             return (self.model_1.predict_proba(test_X) + self.model_2.predict_proba(test_X))/2
-        elif input_user and input_X is not None:
+        if input_user and input_X is not None:
             self.model_1.predict_proba(self.clean_tos(X,input_X))
             self.model_2.predict_proba(self.clean_tos(X,input_X))
             return (self.model_1.predict_proba(self.clean_tos(X,input_X))+
@@ -151,13 +152,14 @@ class ToS_Classifier():
         return self.color_proba
         
 def main():
-    tos = ToS_Classifier('tos_df.csv')
-    companies = pd.read_csv('./tos_df.csv')
+    df = pd.read_csv('tos_df.csv')
+    companies = pd.read_csv('companies_df.csv')
+    tos = ToS_Classifier(df,companies)
     X,y = tos.get_data()
-    X_vectorized = tos.vectorize_text(X,companies)
-    #tos.ensemble_fit(X_vectorized,y)
+    X_vectorized = tos.vectorize_text(X)
+    tos.ensemble_fit(X_vectorized,y)
     with open('classifier.pkl', 'wb') as f:
-       pickle.dump(tos, f)
+        pickle.dump(tos, f)
 
 if __name__ == "__main__":
     main()
