@@ -149,7 +149,7 @@ class SummaryGenerator(object):
         INPUT: none
         OUTPUT: prints hardcoded input and generated annotation
         '''
-        input_sentence = 'You own or otherwise have the lawful right to provide the information that you provide to Alignable or allow Alignable to access under this Agreement, and may request its deletion at any time, unless you have shared information or content with other Users and they have not deleted it, or it was copied or stored by other Users with your permission.'
+        input_sentence = 'You irrevocably grant us perpetual and unlimited permission to reproduce, distribute, create derivative works of, modify, publicly perform (including on a through-to-the-audience basis), communicate to the public, make available, publicly display, and otherwise use and exploit the Feedback and derivatives thereof for any purpose and without restriction, free of charge and without attribution of any kind, including by making, using, selling, offering for sale, importing, and promoting commercial products and services that incorporate or embody Feedback, whether in whole or in part, and whether as provided or as modified.'
 
         print(f"\n\nInput Sentence: {input_sentence}")
         print(f"Reply: {self.reply(input_sentence)}")

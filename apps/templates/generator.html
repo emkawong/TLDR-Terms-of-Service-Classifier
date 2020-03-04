@@ -12,8 +12,7 @@
         integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
-    <script src="{{ url_for('static', filename='js/index.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/generator.js')}}"></script>
 </head>
 
 <body class="grey">
@@ -22,7 +21,7 @@
             <div class="nav-wrapper">
                 <a href="#" class="brand-logo right">T.o.S.</a>
                 <ul id="nav-mobile" class="left hide-on-med-and-down">
-                    <li><a href="sass.html">Term Classification</a></li>
+                    <li><a href="/">Term Classification</a></li>
                     <li><a href="generator.html">Layman Converter</a></li>
                     <li><a href="collapsible.html">About Me</a></li>
                 </ul>
@@ -36,12 +35,12 @@
                 <div class="col s8">
                     <div class="row">
                         <div class="col s12">
-                            <h2>How Good Are Your Terms?</h2>
+                            <h2>Explain These Terms Like I Am Five</h2>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col s12">
-                            <h6>Terms of Services are hard to read, input a paragraph and get back a classification!</h6>
+                            <h6>Terms of Services are hard to read, input a paragraph and get back a generated summary!</h6>
                         </div>
                     </div>
                     <div class="row">
@@ -54,14 +53,14 @@
                             <div class="row">
                                 <div class="input-field col s12">
                                     <!-- START INPUT FROM USER -->
-                                    <textarea id="term" class="materialize-textarea"></textarea>
-                                    <label for="term">Please paste a paragraph below.</label>
+                                    <textarea id="term_gen" class="materialize-textarea"></textarea>
+                                    <label for="term_gen">Please paste a paragraph below.</label>
                                     <!-- END INPUT FROM USER -->
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col s12">
-                                    <button class="btn waves-effect waves-light" id="solve">Analyze</button>
+                                    <button class="btn waves-effect waves-light" id="solve_gen">Generate</button>
                                 </div>
                             </div>
                         </form>
@@ -71,17 +70,10 @@
                 <!-- START RESULTS FOR GOOD/BAD  -->
                 <div class="row">
                     <div class="col s12">
-                        <h1 id="solution"></h1>
+                        <p> The solution is: <span id="solution"></span> </p>
                     </div>
                 </div>
                 <!-- END RESULTS FOR GOOD/BAD  -->
-                <!-- START GRAPH -->
-                <div class="row">
-                    <div class="col s12">
-                        <canvas id="result-chart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-                <!-- END GRAPH -->
             </div>
         </div>
     </main>

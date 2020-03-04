@@ -10,13 +10,24 @@ from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-cleaner = ToS_DataCleaner('../../tosdr.org/api/1/service')
-companies = cleaner.get_company_names()
-df = cleaner.create_df()
-
 @app.route('/', methods=['GET'])
 def index():
     return render_template('classifier.html')
+
+@app.route('/generator.html', methods=['GET'])
+def generator():
+    return render_template('generator.html')
+
+@app.route('/solve_gen', methods=['POST'])
+def solve_gen():
+    user_data = request.json
+    term = user_data['term_gen']
+    model = pickle.load(open('classifier.pkl','rb'))
+    X,_ = model.get_data()
+    probability = model.predict(X,input_user=True,input_X=term)
+    generation = model.get_colors(probability[:,1])[::-1]
+
+    return jsonify({'generation':generation})
 
 @app.route('/solve', methods=['POST'])
 def solve():
