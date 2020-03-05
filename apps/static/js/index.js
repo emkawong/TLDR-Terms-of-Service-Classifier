@@ -39,25 +39,32 @@ $(document).ready(() => {
     window.chart = new Chart(ctx, {
         type: "scatter",
         data: {
-            labels: ["JAN", "FEB", "MAR"],
             datasets: [{
                 label: "Scatter Dataset",
                 data: [
                     {
-                        x: 1,
-                        y: 1
+                        x: 0,
+                        y: 5
                     },
                     {
                         x: 1,
-                        y: 4
+                        y: 5
+                    },
+                    {
+                        x: 2,
+                        y: 5
+                    },
+                    {
+                        x: 3,
+                        y: 5
                     },
                     {
                         x: 4,
-                        y: 7
+                        y: 5
                     }
                 ],
                 showLines: false,
-                pointBackgroundColor: ['#F77B7E', '#F77B7E', '#C7FEDD'],
+                pointBackgroundColor: ['#C7FEDD','#DFEEB9','#F2DE97','#FAA181','#F77B7E'],
                 pointRadius: 10,
                 borderSkipped: true
             }]
@@ -69,7 +76,7 @@ $(document).ready(() => {
                     offset: true,
                     ticks: {
                         max: 5,
-                        suggestedMin: 1,
+                        suggestedMin: -1,
                         suggestedMax: 5,
                     }
                 }],
