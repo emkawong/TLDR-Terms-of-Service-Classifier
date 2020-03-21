@@ -1,21 +1,31 @@
-# Terms of Service - Too Long; Didn't Read
+# Too Long; Didn't Read
+#### 
 
+## Table of contents
 
-## A Wall of Words: An Introduction
+This project can be broken down into two main sections: Classification and Generation, feel free to skip to the section that is most pertinent to your interests. 
+
+1. [Introduction](#introduction)
+2. [Data Preparation](#dataprep)
+3. [Text Classification](#classification)
+    1. [Validation](#validation)
+    2. [Results](#results)
+4. [Text Generation](#generation)
+5. [Application](#application)
+    1. [Data Visualization](#dataviz)
+    2. [Website](#website)
+
+## A Wall of Words: An Introduction <a name="introduction"></a>
 
 The last time I read the full terms of service (TOS) for any of the product I use is - never - and I believe that I am not the only one. As our data becomes more and more valuable, it becomes more and more important that we know where that data goes and how it's being used. Below are two terms of service taken trom Terms of Service: Did Not Read, a website where contributors write brief summaries and label individual terms as good, neutral, bad, or blocker. The first is a TOS from youtube, the second from Google.
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Youtube.png "Less Good")
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Google.png "Good")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/Google.png" width="200" height="200">
 
-My mission was to take these individual TOS, take the labels that were provided, and try and build a model that could classify the TOS into good, bad, or neutral (blocker was grouped into bad as it was too small to classify). After classifying the terms and giving an explainable probability of "badness," I generate an abstractive summary of that term. 
+My mission was to take these individual TOS, take the labels that were provided, and build a model that could classify the TOS into good, bad, or neutral (blocker was grouped into bad as it was too small to classify). After classifying the terms and giving an explainable probability of "badness," I generate an abstractive summary of that term. 
 
-This project cant be broken down into three main portions:
-    1. Data Wrangling
-    2. Classification
-    3. Text Generation
-
-## 1. TFIDF (TFiddy) or Count (VonCount): Thinking about Cleaning
+## 1. TFIDF (TFiddy) or Count (VonCount): Thinking about Cleaning <a name="dataprep"></a>
 
 The data from TOS;DR is easily accessible through their API and also available in their github in individually saved json files. After spending some time pulling and organizing data, I wrangled all of the information into one pandas dataframe. The "dirty" work can all be viewed in my notebook. From that dataframe, for this project I was only interested in two columns. The "document" column that contained all of the 2,549 TOS that were pulled from the website along with the "label" column that contained information on whether that TOS was "good","neutral", or "bad" from the perspective of the contributors to the TOS;DR website.
 
