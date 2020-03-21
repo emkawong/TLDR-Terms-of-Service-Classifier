@@ -41,7 +41,7 @@ To run through an example: If the word "arbitration" is used 1 time in a 20 word
 
 My hypothesis going in was that the TF-IDF would be more useful for me because I was hoping that certain unique words would be better signals for my model and that hypothesis was correct! But only by a little (increase in accuracy of 2%), luckily voncount the count vectorizer will return later.
 
-<img src="https://github.com/emkawong/capstone2/blob/master/src/VonCount.jpeg" alt="Sad_Count" style="width:300px;height:300px;">
+<img src="https://github.com/emkawong/capstone2/blob/master/src/VonCount.jpeg" width="400" height="400">
 
 A couple of other parameters I included: 
  - stopwords - all indications of the company as I felt that there may be some data leakage if all of one company's policies were bad - then the model would learn that "faceco" was a strong indication of a negative classification. 
@@ -53,8 +53,7 @@ The quick, go-to model for text classification is Naive Bayes. A model that is b
 
 Here is the Naive Bayes equation, it is simple but the equation can look a little messy:
 
-![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png "MNB1")
-![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNB2.png "MNB2")
+![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png "MNB1") ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNB2.png "MNB2")
 
 For that reason, I wrote out a simplified version that has helped me make sense of the different moving parts. Below is the equation for the probability that a document is good given all the words that are inside it. 
 
