@@ -19,9 +19,9 @@ This project can be broken down into two main sections: Classification and Gener
 
 The last time I read the full terms of service (TOS) for any of the product I use is - never - and I believe that I am not the only one. As our data becomes more and more valuable, it becomes more and more important that we know where that data goes and how it's being used. Below are two terms of service taken trom Terms of Service: Did Not Read, a website where contributors write brief summaries and label individual terms as good, neutral, bad, or blocker. The first is a TOS from youtube, the second from Google.
 
-<p float="center">
-  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Youtube.png" width="400" height="300"/>
-  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Google.png" width="400" height="300"/> 
+<p float="left">
+  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Youtube.png" width="400" height="400"/>
+  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Google.png" width="400" height="400"/> 
 </p>
 
 My mission was to take these individual TOS, take the labels that were provided, and build a model that could classify the TOS into good, bad, or neutral (blocker was grouped into bad as it was too small to classify). After classifying the terms and giving an explainable probability of "badness," I generate an abstractive summary of that term. 
