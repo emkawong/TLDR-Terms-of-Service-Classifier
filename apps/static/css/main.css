@@ -1,2 +1,28 @@
 /* Sets default height for textarea so it looks taller (otherwise it is the height of single line) */
 textarea.materialize-textarea{height: 10rem;}
+.logo-row {
+    margin-left: 2rem;
+    height: 100%;
+}
+/* .logo-col {
+    padding-right: 0rem !important;
+    padding-left: 1.5rem !important;
+} */
+/* .logo {
+    text-align: right;
+} */
+
+.logo img {
+    width: 4rem;
+    /* height: 3rem; */
+}
+
+.logo-col-left {
+    padding-left: 1.5rem !important;
+    padding-right: 0 !important;
+}
+
+.logo-col-right {
+    padding-left: 0 !important;
+    padding-right: 1.5rem !important;
+}

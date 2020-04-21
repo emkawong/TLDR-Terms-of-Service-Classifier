@@ -75,9 +75,27 @@ $(document).ready(() => {
                 xAxes: [{
                     offset: true,
                     ticks: {
-                        max: 5,
-                        suggestedMin: -1,
+                        max: 5.5,
+                        min: 0,
                         suggestedMax: 5,
+                        callback: function(value, index, values) {
+                            switch (value) {
+                                case 0:
+                                    return 'Twitch';
+                                case 1:
+                                    return 'TikTok';
+                                case 2:
+                                    return 'YouTube';
+                                case 3:
+                                    return 'SoundCloud';
+                                case 4:
+                                    return 'Reddit';
+                                case 5:
+                                    return 'Inputted';
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }],
                 yAxes: [{
