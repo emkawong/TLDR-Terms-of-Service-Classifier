@@ -17,9 +17,12 @@ let send_coefficient_json = function(coefficients) {
 
 let display_graph = function(solutions) {
     window.chart.data.datasets[0].data = [];
+    window.chart.data.labels = []
     window.chart.data.datasets[0].pointBackgroundColor = [];
 
     for (item of solutions.results) {
+        // Replace this with data from the server
+        window.chart.data.labels.push("foo");
         window.chart.data.datasets[0].data.push(item[0]);
         window.chart.data.datasets[0].pointBackgroundColor.push(item[1]);
     }
@@ -67,9 +70,18 @@ $(document).ready(() => {
                 pointBackgroundColor: ['#C7FEDD','#DFEEB9','#F2DE97','#FAA181','#F77B7E'],
                 pointRadius: 10,
                 borderSkipped: true
-            }]
+            }],
         },
         options: {
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.labels[tooltipItem.datasetIndex];
+                        
+                        return label;
+                    }
+                }
+            },
             backgroundColor:'rgb(40,10,20)',
             scales: {
                 xAxes: [{
