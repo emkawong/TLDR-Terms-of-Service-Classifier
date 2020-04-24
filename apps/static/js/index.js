@@ -65,7 +65,7 @@ $(document).ready(() => {
                 ],
                 showLines: false,
                 pointBackgroundColor: ['#C7FEDD','#DFEEB9','#F2DE97','#FAA181','#F77B7E'],
-                pointRadius: 10,
+                pointRadius: 14,
                 borderSkipped: true
             }]
         },
