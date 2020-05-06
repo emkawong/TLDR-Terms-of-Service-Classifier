@@ -38,11 +38,7 @@ A couple of other parameters I included:
 
 The quick, go-to model for text classification is Naive Bayes. A model that is based on the "naive" assumption that each word is independent. In general, naive bayes is considered a good baseline but tends to not be the most accurate model. It works well with a small or a very large corpus, and as my corpus is relatively small, I hoped to get good results! I specifically used the multinomial Naive Bayes model as that has garnered great results with NLP sentiment analysis.
 
-Here is the Naive Bayes equation, it is simple but the equation can look a little messy:
-
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
-
-For that reason, I wrote out a simplified version that has helped me make sense of the different moving parts. Below is the equation for the probability that a document is good given all the words that are inside it. 
+I wrote out a simplified version of Naive Bayes that has helped me make sense of the different moving parts. Below is the equation for the probability that a document is good given all the words that are inside it. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Good-Full%20Example.png "Good-Full Equation")
 
