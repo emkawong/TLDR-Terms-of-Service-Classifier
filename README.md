@@ -1,34 +1,22 @@
 # Too Long; Didn't Read
 #### 
 
-## Table of contents
-
-This project can be broken down into two main sections: Classification and Generation, feel free to skip to the section that is most pertinent to your interests. 
-
-1. [Introduction](#introduction)
-2. [Data Preparation](#dataprep)
-3. [Text Classification](#classification)
-    1. [Validation](#validation)
-    2. [Results](#results)
-4. [Text Generation](#generation)
-5. [Application](#application)
-    1. [Data Visualization](#dataviz)
-    2. [Website](#website)
-
 ## A Wall of Words: An Introduction <a name="introduction"></a>
 
-The last time I read the full terms of service (TOS) for any of the product I use is - never - and I believe that I am not the only one. As our data becomes more and more valuable, it becomes more and more important that we know where that data goes and how it's being used. Below are two terms of service taken trom Terms of Service: Did Not Read, a website where contributors write brief summaries and label individual terms as good, neutral, bad, or blocker. The first is a TOS from youtube, the second from Google.
+As personal data gets more and more valuable, I believe it becomes increasingly important for users to know what they’re getting into before they use the services of any company. My main guiding principle was to provide information to users in a more digestible manner. Below are two Terms of Service (TOS) taken trom Terms of Service: Did Not Read, a website where contributors write brief summaries and label individual terms as good, neutral, or bad. The first is a TOS from youtube, the second from Google.
 
 <p float="left">
-  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Youtube.png" width="400" height="350"/>
-  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Google.png" width="400" height="350"/> 
+  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Youtube.png" width="400" height="300"/>
+  <img src="https://github.com/emkawong/capstone2/blob/master/src/images/Google.png" width="400" height="300"/> 
 </p>
 
-My mission was to take these individual TOS, take the labels that were provided, and build a model that could classify the TOS into good, bad, or neutral (blocker was grouped into bad as it was too small to classify). After classifying the terms and giving an explainable probability of "badness," I generate an abstractive summary of that term. 
+The first TOS has been labeled "bad" by the community and the second TOS as "good". All of the labeling is completely subjective based on what the TOS:DR community has collectively decided is good or bad from the user's perspective. 
 
-## 1. TFIDF (TFiddy) or Count (VonCount): Thinking about Cleaning <a name="dataprep"></a>
+My mission was to take these individual TOS, take the labels that were provided by the website of "good", "bad", and "neutral", and build a model that would automatically classify those TOS. My secondary objective was to go one step further create a summary text generator. 
 
-The data from TOS;DR is easily accessible through their API and also available in their github in individually saved json files. After spending some time pulling and organizing data, I wrangled all of the information into one pandas dataframe. The "dirty" work can all be viewed in my notebook. From that dataframe, for this project I was only interested in two columns. The "document" column that contained all of the 2,549 TOS that were pulled from the website along with the "label" column that contained information on whether that TOS was "good","neutral", or "bad" from the perspective of the contributors to the TOS;DR website.
+## 1. TF-IDF (TFiddy) or Count (VonCount): Thinking about Cleaning <a name="dataprep"></a>
+
+The data from TOS;DR is easily accessible through their API and also available in their github in individually saved json files. After spending some time pulling and organizing data, I wrangled all of the information into one pandas dataframe. From that dataframe, I was only interested in three columns. The "document" column that contained all of the 2,549 TOS that were pulled from the website along with the "label" column that contained information on whether that TOS was "good","neutral", or "bad" from the perspective of the contributors to the TOS;DR website. The "good" and "neutral" labels are aggregated and represented by 0. The "bad" labels are represented by 1. 
 
 As is the case with all NLP projects, I had to parse and clean the text. Below is a picture of what that before and after looks like:
 
@@ -42,27 +30,29 @@ To run through an example: If the word "arbitration" is used 1 time in a 20 word
 
 My hypothesis going in was that the TF-IDF would be more useful for me because I was hoping that certain unique words would be better signals for my model and that hypothesis was correct! But only by a little (increase in accuracy of 2%), luckily voncount the count vectorizer will return later.
 
-<img src="https://github.com/emkawong/capstone2/blob/master/src/VonCount.jpeg" width="400" height="400">
+<img src="https://github.com/emkawong/capstone2/blob/master/src/VonCount.jpeg" width="400" height="400"/>
 
 A couple of other parameters I included: 
  - stopwords - all indications of the company as I felt that there may be some data leakage if all of one company's policies were bad - then the model would learn that "faceco" was a strong indication of a negative classification. 
- - an N-gram range of (1,2), so that phrases like "may retain" and "not retain" could be differentiated a little better. Surprisingly, this did not have a large effect, I hypothesize that the legalize from a company that wants to retain information will be very different from a company that does not - I explore this a little more later.
-
+ - After testing multible variations, I ended on an N-gram range of (1,2), so that phrases like "may retain" and "not retain" could be differentiated better. I tested using an N-gram range of 1 word only and 2 words only and had a drop in my precision and recall score. The recall score is a metric that describes of the "bad" ToS, how many times does my model correctly categorize the ToS as bad. The precision score describes of the number of bad results my model returned, how many of those were correct. The recall and precision score increased about 2% (to end up around 84 and 86, respectively) when I ran the model 100 times for each range and kept all other factors the same. 
+ 
 ## 2. The Glass Slipper: Choosing a Model
 
-The quick, go-to model for text classification is Naive Bayes. A model that is based on the "naive" assumption that each word is independent. In general, naive bayes is considered a good baseline but tends to not be the most accurate model. It works well with a small or a very large corpus, and as my corpus is relatively small, I hoped to get good results! I specifically used the multinomial Naive Bayes model as I was working with multiclass data.
+The quick, go-to model for text classification is Naive Bayes. A model that is based on the "naive" assumption that each word is independent. In general, naive bayes is considered a good baseline but tends to not be the most accurate model. It works well with a small or a very large corpus, and as my corpus is relatively small, I hoped to get good results! I specifically used the multinomial Naive Bayes model as that has garnered great results with NLP sentiment analysis.
 
 Here is the Naive Bayes equation, it is simple but the equation can look a little messy:
 
-![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png "MNB1") ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNB2.png "MNB2")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 For that reason, I wrote out a simplified version that has helped me make sense of the different moving parts. Below is the equation for the probability that a document is good given all the words that are inside it. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Good-Full%20Example.png "Good-Full Equation")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/Good-Full%20Example.png" width="400" height="350"/>
 
 There are three main pieces here, that I've split up even further and color coded. To summarize, the probability of a specific document being good is the probability of any document being good multiplied by the probability that each word in that document is individually good. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Good-Breakdown.png "Good-Breakdown")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 After the probability is calculated for each class, the highest probability is chosen as the classifier. 
 
@@ -71,24 +61,29 @@ After the probability is calculated for each class, the highest probability is c
 Here's an example of a correctly calculated TOS (Acual:"Bad" & Predicted:"Bad")
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/AccuratePredict.png "Correct TOS")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 Here's an example of an incorrectly calculated TOS (Acual:"Good" & Predicted:"Bad")
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/InaccuratePredict.png "Incorrect TOS")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 For being a "naive" model, the results are pretty good! Below is the confusion matrix that calculates the number of Predicted vs. Actual documents for the three classes. The areas where I correctly predicted are darker. The area that I was the most concerned about is the portion that I've labeled the danger zone, for those are the ones that were labeled "bad" and I identified as "good" or "neutral".
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/ConfusionMatrix.png "Confusion Matrix")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
  
 This brings me to my AU-ROC curve that I calculated in the One Vs All method. Since ROC curves are plotted to show the tradeoff between the True Positive and True Negative Rate of two classes, I needed an approach that would allow me to plot my multiclass classifier. 
 
 With One Vs All, what I've done is to train the model three times with Bad Vs Good&Neutral, Good Vs Bad&Neutral, and Neutral Vs Good&Bad. This is easier than classifying the data into three distinct classes so the AUC (Area Under Curve) turns out to be pretty high. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNBROC.png "MNB-ROC")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 I experimented with Logistic Regression, Random Forests, and Gradient Boosting, but they all took longer and they were worse models. I've attached one more ROC plot for Random Forests which was one of the best in comparison, but still worse than Naive Bayes. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/RandomForestROC.png "RandomForest-ROC")
+<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 #### A Side Quest: Finding the Magic Words
 
@@ -108,10 +103,6 @@ Bad:
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/BadWords.png "Bad Words")
 
-
-## 3. Explain The Terms Like I Am 5
-
-So now I've classified the terms of service into good, neutral, 
 
 ## Resources:
 
