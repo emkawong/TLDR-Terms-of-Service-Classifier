@@ -30,8 +30,6 @@ To run through an example: If the word "arbitration" is used 1 time in a 20 word
 
 My hypothesis going in was that the TF-IDF would be more useful for me because I was hoping that certain unique words would be better signals for my model and that hypothesis was correct! But only by a little (increase in accuracy of 2%), luckily voncount the count vectorizer will return later.
 
-<img src="https://github.com/emkawong/capstone2/blob/master/src/VonCount.jpeg" width="400" height="400"/>
-
 A couple of other parameters I included: 
  - stopwords - all indications of the company as I felt that there may be some data leakage if all of one company's policies were bad - then the model would learn that "faceco" was a strong indication of a negative classification. 
  - After testing multible variations, I ended on an N-gram range of (1,2), so that phrases like "may retain" and "not retain" could be differentiated better. I tested using an N-gram range of 1 word only and 2 words only and had a drop in my precision and recall score. The recall score is a metric that describes of the "bad" ToS, how many times does my model correctly categorize the ToS as bad. The precision score describes of the number of bad results my model returned, how many of those were correct. The recall and precision score increased about 2% (to end up around 84 and 86, respectively) when I ran the model 100 times for each range and kept all other factors the same. 
@@ -47,12 +45,10 @@ Here is the Naive Bayes equation, it is simple but the equation can look a littl
 For that reason, I wrote out a simplified version that has helped me make sense of the different moving parts. Below is the equation for the probability that a document is good given all the words that are inside it. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Good-Full%20Example.png "Good-Full Equation")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/Good-Full%20Example.png" width="400" height="350"/>
 
 There are three main pieces here, that I've split up even further and color coded. To summarize, the probability of a specific document being good is the probability of any document being good multiplied by the probability that each word in that document is individually good. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/Good-Breakdown.png "Good-Breakdown")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 After the probability is calculated for each class, the highest probability is chosen as the classifier. 
 
@@ -61,29 +57,24 @@ After the probability is calculated for each class, the highest probability is c
 Here's an example of a correctly calculated TOS (Acual:"Bad" & Predicted:"Bad")
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/AccuratePredict.png "Correct TOS")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 Here's an example of an incorrectly calculated TOS (Acual:"Good" & Predicted:"Bad")
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/InaccuratePredict.png "Incorrect TOS")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 For being a "naive" model, the results are pretty good! Below is the confusion matrix that calculates the number of Predicted vs. Actual documents for the three classes. The areas where I correctly predicted are darker. The area that I was the most concerned about is the portion that I've labeled the danger zone, for those are the ones that were labeled "bad" and I identified as "good" or "neutral".
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/ConfusionMatrix.png "Confusion Matrix")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
  
 This brings me to my AU-ROC curve that I calculated in the One Vs All method. Since ROC curves are plotted to show the tradeoff between the True Positive and True Negative Rate of two classes, I needed an approach that would allow me to plot my multiclass classifier. 
 
 With One Vs All, what I've done is to train the model three times with Bad Vs Good&Neutral, Good Vs Bad&Neutral, and Neutral Vs Good&Bad. This is easier than classifying the data into three distinct classes so the AUC (Area Under Curve) turns out to be pretty high. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/MNBROC.png "MNB-ROC")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 I experimented with Logistic Regression, Random Forests, and Gradient Boosting, but they all took longer and they were worse models. I've attached one more ROC plot for Random Forests which was one of the best in comparison, but still worse than Naive Bayes. 
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/RandomForestROC.png "RandomForest-ROC")
-<img src="https://github.com/emkawong/capstone2/blob/master/src/images/MNB1.png" width="400" height="350"/>
 
 #### A Side Quest: Finding the Magic Words
 
@@ -102,7 +93,6 @@ Neutral:
 Bad:
 
 ![alt text](https://github.com/emkawong/capstone2/blob/master/src/images/BadWords.png "Bad Words")
-
 
 ## Resources:
 
